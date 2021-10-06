@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="mrp_production_form_view_inherited" model="ir.ui.view">
+        <field name="name">mrp.production.inherite</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bom_id']" position="after">
+                <field name="producing_quantity" invisible="1"/>
+                <field name="is_producing_qty" invisible="1"/>
+                <field name="is_workorder" invisible="1"/>
+            </xpath>
+            <xpath expr="//button[@name='button_mark_done']" position="after">
+            	<button name="open_produce_product" attrs="{'invisible': ['|','|', ('state', '=', 'to_close'), ('reservation_state', '!=', 'assigned'),('is_workorder', '=', False)]}" string="Produce" type="object" class="oe_highlight"/>
+                <button name="open_produce_product" attrs="{'invisible': ['|','|', ('state', '=', 'to_close'), ('reservation_state', 'not in', ('confirmed', 'waiting')),('is_workorder', '=', False)]}" string="Produce" type="object"/>
+            </xpath>
+
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button type="object" name="create_all_qty" class="oe_stat_button"
+                        icon="fa-check-circle-o" string="Create Batch Serial No."
+                        attrs="{'invisible': [('state', 'not in', ['confirmed', 'progress'])]}">
+                </button>
+            </xpath>
+
+            <xpath expr="////page/field[@name='move_raw_ids']/.." position="after">
+                <page string="Finished Products">
+                            <field name="finished_move_line_ids" context="{'form_view_ref': 'mrp.view_finisehd_move_line'}" attrs="{'readonly': [('is_locked', '=', True)], 'invisible': [('finished_move_line_ids', '=', [])]}">
+                                 <tree editable="bottom" create="0" delete="0" decoration-muted="state in ('done', 'cancel')">
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="company_id" invisible="1"/>
+                                    <field name="lot_id" groups="stock.group_production_lot" context="{'default_product_id': product_id, 'default_company_id': company_id}" attrs="{'invisible': [('lots_visible', '=', False)]}"/>
+                                    <field name="qty_done" string="Produced"/>
+                                    <field name="lots_visible" invisible="1"/>
+                                    <field name="state" invisible="1"/>
+                                </tree>
+                            </field>
+                            <p attrs="{'invisible': [('finished_move_line_ids', '!=', [])]}">
+                                Use the Produce button or process the work orders to create some finished products.
+                            </p>
+                        </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
